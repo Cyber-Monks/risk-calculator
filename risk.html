@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenFAIR Risk Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>OpenFAIR Risk Calculator</h1>
+    <form id="riskCalculator">
+        <label for="tef">Threat Event Frequency (TEF) (1-5):</label>
+        <input type="number" id="tef" min="1" max="5" required>
+
+        <label for="vuln">Vulnerability (0.1-1.0):</label>
+        <input type="number" id="vuln" step="0.1" min="0.1" max="1.0" required>
+
+        <label for="pl">Primary Loss (PL) (1-5):</label>
+        <input type="number" id="pl" min="1" max="5" required>
+
+        <label for="sl">Secondary Loss (SL) (1-5):</label>
+        <input type="number" id="sl" min="1" max="5" required>
+
+        <button type="button" onclick="calculateRisk()">Calculate Risk Score</button>
+    </form>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        function calculateRisk() {
+            const tef = parseFloat(document.getElementById('tef').value);
+            const vuln = parseFloat(document.getElementById('vuln').value);
+            const pl = parseFloat(document.getElementById('pl').value);
+            const sl = parseFloat(document.getElementById('sl').value);
+
+            if (isNaN(tef) || isNaN(vuln) || isNaN(pl) || isNaN(sl)) {
+                document.getElementById('result').innerText = "Please fill in all fields.";
+                return;
+            }
+
+            // Calculate LEF and LM
+            const lef = tef * vuln;
+            const lm = pl + sl;
+
+            // Calculate overall Risk Score
+            const riskScore = lef * lm;
+
+            // Display the result
+            document.getElementById('result').innerText = 
+                `LEF: ${lef.toFixed(2)}\nLM: ${lm.toFixed(2)}\nRisk Score: ${riskScore.toFixed(2)} (Qualitative Rating: ${getRiskLevel(riskScore)})`;
+        }
+
+        function getRiskLevel(score) {
+            if (score <= 5) return "Low";
+            if (score <= 10) return "Medium";
+            if (score <= 15) return "High";
+            if (score <= 20) return "Very High";
+            return "Critical";
+        }
+    </script>
+</body>
+</html>
